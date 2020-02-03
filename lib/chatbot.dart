@@ -8,53 +8,66 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
-  void _btn() {}
-
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.clear_all),
-          onPressed: _btn,
-        ),
         backgroundColor: Colors.black87,
         title: Text("Super App"),
       ),
       body: Container(
         color: Colors.transparent,
-        child: Wrap(
+        height: MediaQuery.of(context).size.height,
+        child: Column(
           children: <Widget>[
-            Wrap(
-              children: <Widget>[
-                Container(
-                  height: 10,
-                ),
-                Messages(),
-                Messages(
-                  reader: false,
-                  message: "Bonjour",
-                ),
-                Messages(),
-                Messages(),
-                Messages(
-                  message: "Salut",
-                ),
-                Messages(),
-                Messages(),
-                Messages(),
-                Messages(),
-                Messages(),
-                Messages(),
-                Messages(),
-                Messages(),
-              ],
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(
+                    reader: false,
+                  ),
+                  Messages(),
+                  Messages(
+                    message: "You're nice",
+                  ),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                  Messages(),
+                ],
+              ),
             ),
-            TextField(
-              decoration: InputDecoration(
-                  labelText:
-                      SettingsManager.getInstance().getString("enter_message")),
-            )
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue, width: 1.0)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 1.0),
+                    ),
+                    hintText: "HAHA",
+                    labelText: SettingsManager.getInstance()
+                        .getString("enter_message")),
+              ),
+            ),
           ],
         ),
       ),
@@ -95,17 +108,21 @@ class Messages extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.fill, // otherwise the logo will be tiny
               child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                        bottomLeft: Radius.circular(this.senderReader),
-                        bottomRight: Radius.circular(this.readerReader)),
-                    color: this.color),
-                padding: EdgeInsets.all(10.0),
-                child:
-                    Text(this.message, style: TextStyle(color: this.textColor)),
-              ),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(this.senderReader),
+                          bottomRight: Radius.circular(this.readerReader)),
+                      color: this.color),
+                  padding: EdgeInsets.all(10.0),
+                  child: SelectableText(
+                    this.message,
+                    style: TextStyle(color: this.textColor),
+                    toolbarOptions: ToolbarOptions(copy: true),
+                    scrollPhysics: ClampingScrollPhysics(),
+                    maxLines: 1,
+                  )),
             )));
   }
 }
