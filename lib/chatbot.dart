@@ -8,12 +8,18 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
+  void _addMessage(String message, bool user) {
+    Widget w = ListView.builder(itemBuilder: (BuildContext context, int index) {
+      return Text("HAHA");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
-        title: Text("Super App"),
+        title: Text("Assistance Chat"),
       ),
       body: Container(
         color: Colors.transparent,
@@ -23,8 +29,10 @@ class _ChatBotState extends State<ChatBot> {
             Expanded(
               child: ListView(
                 children: <Widget>[
-                  Messages(),
-                  Messages(),
+                  Container(height: 15),
+                  Messages(
+                      message: "Bonjour,\nLa vie est belle", reader: false),
+                  Messages(message: "Intéressant"),
                   Messages(),
                   Messages(),
                   Messages(
@@ -32,7 +40,7 @@ class _ChatBotState extends State<ChatBot> {
                   ),
                   Messages(),
                   Messages(
-                    message: "You're nice",
+                    message: "Bonjour",
                   ),
                   Messages(),
                   Messages(),
@@ -63,7 +71,7 @@ class _ChatBotState extends State<ChatBot> {
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black, width: 1.0),
                     ),
-                    hintText: "HAHA",
+                    hintText: "Message",
                     labelText: SettingsManager.getInstance()
                         .getString("enter_message")),
               ),
@@ -106,7 +114,7 @@ class Messages extends StatelessWidget {
         child: Align(
             alignment: this.alignment,
             child: FittedBox(
-              fit: BoxFit.fill, // otherwise the logo will be tiny
+              //fit: BoxFit.fill, // otherwise the logo will be tiny
               child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -119,9 +127,11 @@ class Messages extends StatelessWidget {
                   child: SelectableText(
                     this.message,
                     style: TextStyle(color: this.textColor),
-                    toolbarOptions: ToolbarOptions(copy: true),
+                    toolbarOptions: ToolbarOptions(
+                      copy: true,
+                      selectAll: true,
+                    ),
                     scrollPhysics: ClampingScrollPhysics(),
-                    maxLines: 1,
                   )),
             )));
   }
