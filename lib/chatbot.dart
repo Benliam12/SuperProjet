@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
+import 'package:vibrate/vibrate.dart';
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -12,6 +15,10 @@ class _ChatBotState extends State<ChatBot> {
     Widget w = ListView.builder(itemBuilder: (BuildContext context, int index) {
       return Text("HAHA");
     });
+  }
+
+  void _onSendMessage() {
+    setState(() {});
   }
 
   @override
@@ -43,7 +50,9 @@ class _ChatBotState extends State<ChatBot> {
                     message: "Bonjour",
                   ),
                   Messages(),
-                  Messages(),
+                  Messages(
+                    reader: false,
+                  ),
                   Messages(),
                   Messages(),
                   Messages(),
@@ -56,25 +65,42 @@ class _ChatBotState extends State<ChatBot> {
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 1.0)),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.0),
-                    ),
-                    hintText: "Message",
-                    labelText: SettingsManager.getInstance()
-                        .getString("enter_message")),
-              ),
+            Container(
+              color: Colors.grey[100],
+              child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.blue, width: 1.0)),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.black, width: 1.0),
+                              ),
+                              labelStyle: TextStyle(color: Colors.black),
+                              labelText: SettingsManager.getInstance()
+                                  .getString("enter_message")),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: Colors.blue[900],
+                        ),
+                        onPressed: _onSendMessage,
+                      ),
+                    ],
+                  )),
             ),
           ],
         ),
@@ -132,6 +158,7 @@ class Messages extends StatelessWidget {
                       selectAll: true,
                     ),
                     scrollPhysics: ClampingScrollPhysics(),
+                    onTap: () => {Vibrate.feedback(FeedbackType.error)},
                   )),
             )));
   }

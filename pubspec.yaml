@@ -37,6 +37,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  vibrate:
 
 
 # For information on the generic Dart part of this file, see the
@@ -44,8 +45,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-  assets:
-    - assets/img/
+ # assets:
+  #  - assets/img/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

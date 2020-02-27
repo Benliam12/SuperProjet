@@ -9,6 +9,15 @@ class SettingsManager {
   void setup() {}
 
   String getString(String key) {
-    return "";
+    String value = "";
+    switch (key) {
+      case "enter_message":
+        value = "Votre message";
+        break;
+      default:
+        break;
+    }
+
+    return value;
   }
 }
