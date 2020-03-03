@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
-import 'package:vibrate/vibrate.dart';
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -17,8 +16,26 @@ class _ChatBotState extends State<ChatBot> {
     });
   }
 
+  List<Messages> messages = [];
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
   void _onSendMessage() {
-    setState(() {});
+    setState(() {
+      String message = myController.text;
+      List<String> splitString = message.split('');
+
+      messages.add(new Messages(
+        message: message,
+      ));
+      myController.clear();
+    });
   }
 
   @override
@@ -33,38 +50,13 @@ class _ChatBotState extends State<ChatBot> {
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: <Widget>[
+            Container(height: 15),
             Expanded(
-              child: ListView(
-                children: <Widget>[
-                  Container(height: 15),
-                  Messages(
-                      message: "Bonjour,\nLa vie est belle", reader: false),
-                  Messages(message: "Intéressant"),
-                  Messages(),
-                  Messages(),
-                  Messages(
-                    reader: false,
-                  ),
-                  Messages(),
-                  Messages(
-                    message: "Bonjour",
-                  ),
-                  Messages(),
-                  Messages(
-                    reader: false,
-                  ),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                ],
-              ),
-            ),
+                child: new ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return messages[index];
+                    })),
             Container(
               color: Colors.grey[100],
               child: Padding(
@@ -73,6 +65,7 @@ class _ChatBotState extends State<ChatBot> {
                     children: <Widget>[
                       Flexible(
                         child: TextFormField(
+                          controller: myController,
                           validator: (value) {
                             if (value == null) {
                               return 'Please enter some text';
@@ -97,7 +90,7 @@ class _ChatBotState extends State<ChatBot> {
                           Icons.send,
                           color: Colors.blue[900],
                         ),
-                        onPressed: _onSendMessage,
+                        onPressed: () => {_onSendMessage()},
                       ),
                     ],
                   )),
@@ -136,6 +129,7 @@ class Messages extends StatelessWidget {
     }
 
     return Container(
+        width: MediaQuery.of(context).size.width * 0.50,
         margin: EdgeInsets.only(bottom: 10.0, right: 10.0, left: 10.0),
         child: Align(
             alignment: this.alignment,
@@ -150,16 +144,18 @@ class Messages extends StatelessWidget {
                           bottomRight: Radius.circular(this.readerReader)),
                       color: this.color),
                   padding: EdgeInsets.all(10.0),
-                  child: SelectableText(
-                    this.message,
-                    style: TextStyle(color: this.textColor),
-                    toolbarOptions: ToolbarOptions(
-                      copy: true,
-                      selectAll: true,
-                    ),
-                    scrollPhysics: ClampingScrollPhysics(),
-                    onTap: () => {Vibrate.feedback(FeedbackType.error)},
-                  )),
+                  child: LimitedBox(
+                      maxWidth: 205,
+                      child: SelectableText(
+                        this.message,
+                        style: TextStyle(color: this.textColor),
+                        toolbarOptions: ToolbarOptions(
+                          copy: true,
+                          selectAll: true,
+                        ),
+                        scrollPhysics: ClampingScrollPhysics(),
+                        onTap: () => {},
+                      ))),
             )));
   }
 }
