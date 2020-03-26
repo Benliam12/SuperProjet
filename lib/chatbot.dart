@@ -1,5 +1,10 @@
+import 'dart:developer';
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -8,10 +13,49 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
-  void _addMessage(String message, bool user) {
-    Widget w = ListView.builder(itemBuilder: (BuildContext context, int index) {
-      return Text("HAHA");
+  List<Messages> messages = [];
+  final myController = TextEditingController();
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  //Clear messages
+  void _clearMessage() {
+    setState(() {
+      messages.clear();
     });
+
+    SettingsManager.getInstance().testRead();
+  }
+
+  // When user sends message
+  void _onSendMessage({bool user = true, String message = ""}) async {
+    setState(() {
+      message = myController.text;
+      if (message.trim().length > 0) {
+        List<String> splitString = message.split('');
+
+        messages.add(new Messages(
+          message: message,
+          reader: true,
+        ));
+
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent +
+              146, // Random value to make sure the scrolling is done to the end for average lenth messages.
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+      myController.clear();
+    });
+
+    SettingsManager.getInstance().testWrite();
   }
 
   @override
@@ -20,61 +64,63 @@ class _ChatBotState extends State<ChatBot> {
       appBar: AppBar(
         backgroundColor: Colors.black87,
         title: Text("Assistance Chat"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _clearMessage,
+          ),
+        ],
       ),
       body: Container(
         color: Colors.transparent,
         height: MediaQuery.of(context).size.height,
         child: Column(
           children: <Widget>[
+            Container(height: 15),
             Expanded(
-              child: ListView(
-                children: <Widget>[
-                  Container(height: 15),
-                  Messages(
-                      message: "Bonjour,\nLa vie est belle", reader: false),
-                  Messages(message: "Intéressant"),
-                  Messages(),
-                  Messages(),
-                  Messages(
-                    reader: false,
-                  ),
-                  Messages(),
-                  Messages(
-                    message: "Bonjour",
-                  ),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                  Messages(),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 1.0)),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 1.0),
-                    ),
-                    hintText: "Message",
-                    labelText: SettingsManager.getInstance()
-                        .getString("enter_message")),
-              ),
+                child: new ListView.builder(
+                    controller: _scrollController,
+                    itemCount: messages.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return messages[index];
+                    })),
+            Container(
+              color: Colors.grey[100],
+              child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                        child: TextFormField(
+                          controller: myController,
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.blue, width: 1.0)),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.black, width: 1.0),
+                              ),
+                              labelStyle: TextStyle(color: Colors.black),
+                              labelText: SettingsManager.getInstance()
+                                  .getString("enter_message")),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: Colors.blue[900],
+                        ),
+                        onPressed: () => {_onSendMessage()},
+                      ),
+                    ],
+                  )),
             ),
           ],
         ),
@@ -83,6 +129,7 @@ class _ChatBotState extends State<ChatBot> {
   }
 }
 
+//Message Bubles
 class Messages extends StatelessWidget {
   final String message;
   final bool reader;
@@ -110,6 +157,7 @@ class Messages extends StatelessWidget {
     }
 
     return Container(
+        width: MediaQuery.of(context).size.width * 0.50,
         margin: EdgeInsets.only(bottom: 10.0, right: 10.0, left: 10.0),
         child: Align(
             alignment: this.alignment,
@@ -124,15 +172,18 @@ class Messages extends StatelessWidget {
                           bottomRight: Radius.circular(this.readerReader)),
                       color: this.color),
                   padding: EdgeInsets.all(10.0),
-                  child: SelectableText(
-                    this.message,
-                    style: TextStyle(color: this.textColor),
-                    toolbarOptions: ToolbarOptions(
-                      copy: true,
-                      selectAll: true,
-                    ),
-                    scrollPhysics: ClampingScrollPhysics(),
-                  )),
+                  child: LimitedBox(
+                      maxWidth: 205,
+                      child: SelectableText(
+                        this.message,
+                        style: TextStyle(color: this.textColor),
+                        toolbarOptions: ToolbarOptions(
+                          copy: true,
+                          selectAll: true,
+                        ),
+                        scrollPhysics: ClampingScrollPhysics(),
+                        onTap: () => {},
+                      ))),
             )));
   }
 }
