@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -26,6 +29,8 @@ class _ChatBotState extends State<ChatBot> {
     setState(() {
       messages.clear();
     });
+
+    SettingsManager.getInstance().testRead();
   }
 
   // When user sends message
@@ -49,6 +54,8 @@ class _ChatBotState extends State<ChatBot> {
       }
       myController.clear();
     });
+
+    SettingsManager.getInstance().testWrite();
   }
 
   @override

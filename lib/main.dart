@@ -59,25 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
     "Astrology"
   ];
 
-  void _settings() {
-    setState(() {
-      colors = [
-        Colors.blue,
-        Colors.red,
-        Colors.purple,
-        Colors.green,
-        Colors.pink
-      ];
-      title = [
-        "Flash Card",
-        "Calendar",
-        "Chimistry Calculator",
-        "Assistant Chat",
-        "Astrology"
-      ];
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
