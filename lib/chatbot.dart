@@ -10,14 +10,9 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
-  void _addMessage(String message, bool user) {
-    Widget w = ListView.builder(itemBuilder: (BuildContext context, int index) {
-      return Text("HAHA");
-    });
-  }
-
   List<Messages> messages = [];
   final myController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -26,14 +21,32 @@ class _ChatBotState extends State<ChatBot> {
     super.dispose();
   }
 
-  void _onSendMessage() {
+  //Clear messages
+  void _clearMessage() {
     setState(() {
-      String message = myController.text;
-      List<String> splitString = message.split('');
+      messages.clear();
+    });
+  }
 
-      messages.add(new Messages(
-        message: message,
-      ));
+  // When user sends message
+  void _onSendMessage({bool user = true, String message = ""}) async {
+    setState(() {
+      message = myController.text;
+      if (message.trim().length > 0) {
+        List<String> splitString = message.split('');
+
+        messages.add(new Messages(
+          message: message,
+          reader: true,
+        ));
+
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent +
+              146, // Random value to make sure the scrolling is done to the end for average lenth messages.
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+        );
+      }
       myController.clear();
     });
   }
@@ -44,6 +57,12 @@ class _ChatBotState extends State<ChatBot> {
       appBar: AppBar(
         backgroundColor: Colors.black87,
         title: Text("Assistance Chat"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _clearMessage,
+          ),
+        ],
       ),
       body: Container(
         color: Colors.transparent,
@@ -53,6 +72,7 @@ class _ChatBotState extends State<ChatBot> {
             Container(height: 15),
             Expanded(
                 child: new ListView.builder(
+                    controller: _scrollController,
                     itemCount: messages.length,
                     itemBuilder: (BuildContext ctxt, int index) {
                       return messages[index];
@@ -102,6 +122,7 @@ class _ChatBotState extends State<ChatBot> {
   }
 }
 
+//Message Bubles
 class Messages extends StatelessWidget {
   final String message;
   final bool reader;
