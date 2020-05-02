@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -16,6 +18,9 @@ class _ChatBotState extends State<ChatBot> {
   List<Messages> messages = [];
   final myController = TextEditingController();
   final _scrollController = ScrollController();
+  List<Future<Messages>> messages2 = List<Future<Messages>>();
+  List<FutureBuilder<Messages>> messageBuilders =
+      List<FutureBuilder<Messages>>();
 
   @override
   void dispose() {
@@ -33,8 +38,70 @@ class _ChatBotState extends State<ChatBot> {
     SettingsManager.getInstance().testRead();
   }
 
+  Future<Messages> userQuestion(String message) async {
+    message = myController.text;
+    if (message.trim().length > 0) {
+      return new Messages(
+        message: message,
+        reader: true,
+      );
+    } else {
+      return null;
+    }
+  }
+
+  Future<Messages> serverQuestion(String message) async {
+    String url = "http://vps.benliam12.net:8000";
+    Map<String, String> headers = {"Content-type": "application/json"};
+    List<String> datas = new List<String>();
+    datas.add(message);
+    String json = jsonEncode(datas);
+
+    http.Response response = await http.post(url, headers: headers, body: json);
+    int statusCode = response.statusCode;
+    String body = response.body;
+
+    List<dynamic> responses = jsonDecode(body);
+    String answer = "Il y a eu une erreur de traitement!";
+    if (statusCode == 200) {
+      answer = responses[0];
+    }
+
+    return new Messages(
+      message: answer,
+      reader: false,
+    );
+  }
+
+  void serverQuestionRequest(String message) async {
+    String url = "http://vps.benliam12.net:8000";
+    Map<String, String> headers = {"Content-type": "application/json"};
+    List<String> datas = new List<String>();
+    datas.add(message);
+    String json = jsonEncode(datas);
+
+    http.Response response = await http.post(url, headers: headers, body: json);
+    int statusCode = response.statusCode;
+    String body = response.body;
+
+    List<dynamic> responses = jsonDecode(body);
+    setState(() {
+      messages.add(new Messages(
+        message: responses[0],
+        reader: false,
+      ));
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent +
+            146, // Random value to make sure the scrolling is done to the end for average lenth messages.
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
+  }
+
   // When user sends message
-  void _onSendMessage({bool user = true, String message = ""}) async {
+  void _onSendMessage(BuildContext context,
+      {bool user = true, String message = ""}) async {
     setState(() {
       message = myController.text;
       if (message.trim().length > 0) {
@@ -44,6 +111,8 @@ class _ChatBotState extends State<ChatBot> {
           message: message,
           reader: true,
         ));
+
+        serverQuestionRequest(message);
 
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent +
@@ -117,7 +186,7 @@ class _ChatBotState extends State<ChatBot> {
                           Icons.send,
                           color: Colors.blue[900],
                         ),
-                        onPressed: () => {_onSendMessage()},
+                        onPressed: () => {_onSendMessage(context)},
                       ),
                     ],
                   )),

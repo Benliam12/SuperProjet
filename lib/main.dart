@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_app/helloelo.dart';
 import 'package:login_app/setting_manager.dart';
 
 import 'chatbot.dart';
@@ -131,6 +132,11 @@ class Activities extends StatelessWidget {
         MaterialPageRoute(builder: (context) => ChatBot()),
       );
       return;
+    } else if (this.id == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HelloElo()),
+      );
     }
 
     final scaffold = Scaffold.of(context);
