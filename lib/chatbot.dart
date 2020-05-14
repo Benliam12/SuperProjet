@@ -15,7 +15,6 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
-  List<Messages> messages = [];
   final myController = TextEditingController();
   final _scrollController = ScrollController();
   List<Future<Messages>> messages2 = List<Future<Messages>>();
@@ -32,22 +31,60 @@ class _ChatBotState extends State<ChatBot> {
   //Clear messages
   void _clearMessage() {
     setState(() {
-      messages.clear();
+      messageBuilders.clear();
     });
 
     SettingsManager.getInstance().testRead();
   }
 
-  Future<Messages> userQuestion(String message) async {
-    message = myController.text;
-    if (message.trim().length > 0) {
-      return new Messages(
-        message: message,
-        reader: true,
-      );
-    } else {
-      return null;
+  void makeControllers() {
+    String message = myController.text;
+    if (message.trim().length == 0) {
+      return;
     }
+
+    setState(() {
+      FutureBuilder<Messages> builder1 = FutureBuilder<Messages>(
+          future: userQuestion(message),
+          builder: (context, snapshot) {
+            return new Messages(
+              message: message,
+              reader: true,
+            );
+          });
+
+      FutureBuilder<Messages> builder2 = FutureBuilder<Messages>(
+          future: serverQuestion(message),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return new Messages(
+                message: snapshot.data.message,
+                reader: false,
+              );
+            }
+
+            return new Messages(message: "...", reader: false);
+          });
+      messageBuilders.add(builder1);
+      setState(() {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent + 100,
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+        );
+      });
+      myController.clear();
+      sleep(new Duration(milliseconds: 300));
+      messageBuilders.add(builder2);
+    });
+  }
+
+  Future<Messages> userQuestion(String message) async {
+    setState(() {});
+    return new Messages(
+      message: message,
+      reader: true,
+    );
   }
 
   Future<Messages> serverQuestion(String message) async {
@@ -55,9 +92,10 @@ class _ChatBotState extends State<ChatBot> {
     Map<String, String> headers = {"Content-type": "application/json"};
     List<String> datas = new List<String>();
     datas.add(message);
-    String json = jsonEncode(datas);
+    String jsonString = jsonEncode(datas);
 
-    http.Response response = await http.post(url, headers: headers, body: json);
+    http.Response response =
+        await http.post(url, headers: headers, body: jsonString);
     int statusCode = response.statusCode;
     String body = response.body;
 
@@ -65,7 +103,27 @@ class _ChatBotState extends State<ChatBot> {
     String answer = "Il y a eu une erreur de traitement!";
     if (statusCode == 200) {
       answer = responses[0];
+      try {
+        // if this is custom answer
+        int indexCode = int.parse(answer);
+        url = "http://dev.benliam12.net/chatbot/process.php";
+        datas.clear();
+        datas.add(indexCode.toString());
+        jsonString = jsonEncode(datas);
+        response = await http.post(url, headers: headers, body: jsonString);
+        if (response.statusCode == 200) {
+          answer = response.body;
+          // answer = jsonDecode(response.body)[0];
+        }
+      } catch (e) {}
     }
+    setState(() {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 100,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
 
     return new Messages(
       message: answer,
@@ -73,65 +131,11 @@ class _ChatBotState extends State<ChatBot> {
     );
   }
 
-  void serverQuestionRequest(String message) async {
-    String url = "http://vps.benliam12.net:8000";
-    Map<String, String> headers = {"Content-type": "application/json"};
-    List<String> datas = new List<String>();
-    datas.add(message);
-    String json = jsonEncode(datas);
-
-    http.Response response = await http.post(url, headers: headers, body: json);
-    int statusCode = response.statusCode;
-    String body = response.body;
-
-    List<dynamic> responses = jsonDecode(body);
-    setState(() {
-      messages.add(new Messages(
-        message: responses[0],
-        reader: false,
-      ));
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent +
-            146, // Random value to make sure the scrolling is done to the end for average lenth messages.
-        curve: Curves.easeOut,
-        duration: const Duration(milliseconds: 300),
-      );
-    });
-  }
-
-  // When user sends message
-  void _onSendMessage(BuildContext context,
-      {bool user = true, String message = ""}) async {
-    setState(() {
-      message = myController.text;
-      if (message.trim().length > 0) {
-        List<String> splitString = message.split('');
-
-        messages.add(new Messages(
-          message: message,
-          reader: true,
-        ));
-
-        serverQuestionRequest(message);
-
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent +
-              146, // Random value to make sure the scrolling is done to the end for average lenth messages.
-          curve: Curves.easeOut,
-          duration: const Duration(milliseconds: 300),
-        );
-      }
-      myController.clear();
-    });
-
-    SettingsManager.getInstance().testWrite();
-  }
-
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.lightGreenAccent[700],
         title: Text("Assistance Chat"),
         actions: <Widget>[
           IconButton(
@@ -149,9 +153,9 @@ class _ChatBotState extends State<ChatBot> {
             Expanded(
                 child: new ListView.builder(
                     controller: _scrollController,
-                    itemCount: messages.length,
+                    itemCount: messageBuilders.length,
                     itemBuilder: (BuildContext ctxt, int index) {
-                      return messages[index];
+                      return messageBuilders[index];
                     })),
             Container(
               color: Colors.grey[100],
@@ -171,7 +175,7 @@ class _ChatBotState extends State<ChatBot> {
                           decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Colors.blue, width: 1.0)),
+                                      color: Colors.green, width: 1.0)),
                               enabledBorder: OutlineInputBorder(
                                 borderSide:
                                     BorderSide(color: Colors.black, width: 1.0),
@@ -184,9 +188,9 @@ class _ChatBotState extends State<ChatBot> {
                       IconButton(
                         icon: Icon(
                           Icons.send,
-                          color: Colors.blue[900],
+                          color: Colors.green,
                         ),
-                        onPressed: () => {_onSendMessage(context)},
+                        onPressed: makeControllers,
                       ),
                     ],
                   )),
@@ -220,7 +224,7 @@ class Messages extends StatelessWidget {
     if (reader) {
       this.senderReader = 20;
       this.readerReader = 0;
-      this.color = Colors.blue;
+      this.color = Colors.green;
       this.textColor = Colors.white;
       this.alignment = Alignment.topRight;
     }

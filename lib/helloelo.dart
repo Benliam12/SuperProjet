@@ -33,13 +33,13 @@ class _HelloEloState extends State<HelloElo> {
     Map<String, String> headers = {"Content-type": "application/json"};
 
     List<double> datas = List<double>();
-    datas.add(0.8);
-    datas.add(0.8);
+    datas.add(0.8); // data 1
+    datas.add(0.8); // data 2
     String json = jsonEncode(datas);
     http.Response response = await http.post(url, headers: headers, body: json);
     int statusCode = response.statusCode;
     String body = response.body;
-    print('$body - $statusCode');
+    print('$body - $statusCode'); // Body est la valeur de retour.
   }
 
   _makePostRequest() async {
@@ -97,6 +97,14 @@ class _HelloEloState extends State<HelloElo> {
     print(json.encode(listValeurs));
   }
 
+  void _testingEloShit() {
+    String output = "{c: 2.0*d, b: d, a: d}";
+
+    Map jsonTest = jsonDecode(output);
+
+    print(jsonTest.containsKey("a"));
+  }
+
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
@@ -108,7 +116,7 @@ class _HelloEloState extends State<HelloElo> {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.system_update),
-              onPressed: _randyPostRequest,
+              onPressed: _testingEloShit,
             )
           ],
         ),

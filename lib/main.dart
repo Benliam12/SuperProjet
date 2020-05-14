@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:login_app/helloelo.dart';
+import 'package:login_app/Astro.dart';
+import 'package:login_app/calculator.dart';
+import 'package:login_app/chimie.dart';
+import 'package:login_app/flashcard.dart';
 import 'package:login_app/setting_manager.dart';
 
 import 'chatbot.dart';
@@ -47,15 +50,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   var colors = [
     Colors.blue,
-    Colors.red,
-    Colors.purple,
-    Colors.green,
-    Colors.pink
+    Colors.orange[800],
+    Colors.pink[400],
+    Colors.greenAccent[400],
+    Colors.black
   ];
   var title = [
     "Flash Card",
-    "Calendar",
-    "Chimistry Calculator",
+    "Calculatrice",
+    "Chimie",
     "Assistant Chat",
     "Astrology"
   ];
@@ -126,36 +129,50 @@ class Activities extends StatelessWidget {
   }
 
   void test(BuildContext context) {
-    if (this.id == 3) {
+    if (this.id == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => FlashCard()),
+      );
+    } else if (this.id == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Calculator()),
+      );
+    } else if (this.id == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Chimie()),
+      );
+    } else if (this.id == 3) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ChatBot()),
       );
-      return;
     } else if (this.id == 4) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HelloElo()),
+        MaterialPageRoute(builder: (context) => Astro()),
       );
-    }
-
-    final scaffold = Scaffold.of(context);
-    Scaffold.of(context).showSnackBar(SnackBar(
-      backgroundColor: Colors.white,
-      duration: Duration(milliseconds: 600),
-      content: Container(
-        height: 60,
-        child: Text(
-          this.title,
-          style: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+    } else {
+      final scaffold = Scaffold.of(context);
+      Scaffold.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.white,
+        duration: Duration(milliseconds: 600),
+        content: Container(
+          height: 60,
+          child: Text(
+            this.title,
+            style: TextStyle(
+                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
         ),
-      ),
-      action: SnackBarAction(
-          textColor: Colors.black54,
-          label: 'HIDE',
-          onPressed: scaffold.hideCurrentSnackBar),
-    ));
+        action: SnackBarAction(
+            textColor: Colors.black54,
+            label: 'HIDE',
+            onPressed: scaffold.hideCurrentSnackBar),
+      ));
+    }
   }
 }

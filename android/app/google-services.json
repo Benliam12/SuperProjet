@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "707713861681",
+    "firebase_url": "https://semester-project-d6c23.firebaseio.com",
+    "project_id": "semester-project-d6c23",
+    "storage_bucket": "semester-project-d6c23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707713861681:android:1c59a904f68b7246fdad10",
+        "android_client_info": {
+          "package_name": "com.example.login_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "707713861681-eca9b42sn6lhnedotha79nevj2mco1g8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUZSvZooF1sHprC_CtXHGm5G7r4h03w_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "707713861681-eca9b42sn6lhnedotha79nevj2mco1g8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707713861681:android:305ce4c5bafb2584fdad10",
+        "android_client_info": {
+          "package_name": "com.example.semester_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "707713861681-eca9b42sn6lhnedotha79nevj2mco1g8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUZSvZooF1sHprC_CtXHGm5G7r4h03w_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "707713861681-eca9b42sn6lhnedotha79nevj2mco1g8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
