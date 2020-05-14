@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ChatBot extends StatefulWidget {
   ChatBot({Key key}) : super(key: key);
@@ -13,9 +15,11 @@ class ChatBot extends StatefulWidget {
 }
 
 class _ChatBotState extends State<ChatBot> {
-  List<Messages> messages = [];
   final myController = TextEditingController();
   final _scrollController = ScrollController();
+  List<Future<Messages>> messages2 = List<Future<Messages>>();
+  List<FutureBuilder<Messages>> messageBuilders =
+      List<FutureBuilder<Messages>>();
 
   @override
   void dispose() {
@@ -27,42 +31,111 @@ class _ChatBotState extends State<ChatBot> {
   //Clear messages
   void _clearMessage() {
     setState(() {
-      messages.clear();
+      messageBuilders.clear();
     });
 
     SettingsManager.getInstance().testRead();
   }
 
-  // When user sends message
-  void _onSendMessage({bool user = true, String message = ""}) async {
+  void makeControllers() {
+    String message = myController.text;
+    if (message.trim().length == 0) {
+      return;
+    }
+
     setState(() {
-      message = myController.text;
-      if (message.trim().length > 0) {
-        List<String> splitString = message.split('');
+      FutureBuilder<Messages> builder1 = FutureBuilder<Messages>(
+          future: userQuestion(message),
+          builder: (context, snapshot) {
+            return new Messages(
+              message: message,
+              reader: true,
+            );
+          });
 
-        messages.add(new Messages(
-          message: message,
-          reader: true,
-        ));
+      FutureBuilder<Messages> builder2 = FutureBuilder<Messages>(
+          future: serverQuestion(message),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return new Messages(
+                message: snapshot.data.message,
+                reader: false,
+              );
+            }
 
+            return new Messages(message: "...", reader: false);
+          });
+      messageBuilders.add(builder1);
+      setState(() {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent +
-              146, // Random value to make sure the scrolling is done to the end for average lenth messages.
+          _scrollController.position.maxScrollExtent + 100,
           curve: Curves.easeOut,
           duration: const Duration(milliseconds: 300),
         );
-      }
+      });
       myController.clear();
+      sleep(new Duration(milliseconds: 300));
+      messageBuilders.add(builder2);
+    });
+  }
+
+  Future<Messages> userQuestion(String message) async {
+    setState(() {});
+    return new Messages(
+      message: message,
+      reader: true,
+    );
+  }
+
+  Future<Messages> serverQuestion(String message) async {
+    String url = "http://vps.benliam12.net:8000";
+    Map<String, String> headers = {"Content-type": "application/json"};
+    List<String> datas = new List<String>();
+    datas.add(message);
+    String jsonString = jsonEncode(datas);
+
+    http.Response response =
+        await http.post(url, headers: headers, body: jsonString);
+    int statusCode = response.statusCode;
+    String body = response.body;
+
+    List<dynamic> responses = jsonDecode(body);
+    String answer = "Il y a eu une erreur de traitement!";
+    if (statusCode == 200) {
+      answer = responses[0];
+      try {
+        // if this is custom answer
+        int indexCode = int.parse(answer);
+        url = "http://dev.benliam12.net/chatbot/process.php";
+        datas.clear();
+        datas.add(indexCode.toString());
+        jsonString = jsonEncode(datas);
+        response = await http.post(url, headers: headers, body: jsonString);
+        if (response.statusCode == 200) {
+          answer = response.body;
+          // answer = jsonDecode(response.body)[0];
+        }
+      } catch (e) {}
+    }
+    setState(() {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 100,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
     });
 
-    SettingsManager.getInstance().testWrite();
+    return new Messages(
+      message: answer,
+      reader: false,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.lightGreenAccent[700],
         title: Text("Assistance Chat"),
         actions: <Widget>[
           IconButton(
@@ -80,9 +153,9 @@ class _ChatBotState extends State<ChatBot> {
             Expanded(
                 child: new ListView.builder(
                     controller: _scrollController,
-                    itemCount: messages.length,
+                    itemCount: messageBuilders.length,
                     itemBuilder: (BuildContext ctxt, int index) {
-                      return messages[index];
+                      return messageBuilders[index];
                     })),
             Container(
               color: Colors.grey[100],
@@ -102,7 +175,7 @@ class _ChatBotState extends State<ChatBot> {
                           decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Colors.blue, width: 1.0)),
+                                      color: Colors.green, width: 1.0)),
                               enabledBorder: OutlineInputBorder(
                                 borderSide:
                                     BorderSide(color: Colors.black, width: 1.0),
@@ -115,9 +188,9 @@ class _ChatBotState extends State<ChatBot> {
                       IconButton(
                         icon: Icon(
                           Icons.send,
-                          color: Colors.blue[900],
+                          color: Colors.green,
                         ),
-                        onPressed: () => {_onSendMessage()},
+                        onPressed: makeControllers,
                       ),
                     ],
                   )),
@@ -151,7 +224,7 @@ class Messages extends StatelessWidget {
     if (reader) {
       this.senderReader = 20;
       this.readerReader = 0;
-      this.color = Colors.blue;
+      this.color = Colors.green;
       this.textColor = Colors.white;
       this.alignment = Alignment.topRight;
     }
