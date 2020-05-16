@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "Calculatrice",
     "Chimie",
     "Assistant Chat",
-    "Astrology"
+    "Astronomie"
   ];
 
   @override

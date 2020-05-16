@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 class Atome {
   static bool isNumeric(String s) {
     if (s == null) {

@@ -73,7 +73,6 @@ class Cards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Card(
       color: Colors.lightBlue,
       child: Row(

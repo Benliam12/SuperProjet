@@ -4,7 +4,8 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:login_app/chatbot.dart';
+import 'package:login_app/main.dart';
 
 import 'MyPainter.dart';
 
@@ -31,6 +32,9 @@ class _HomeContentState extends State<HomeContent>
   double newPercentage = 0;
   double nbDeFoisBouton = 0;
   double rateSpeed = 1;
+
+  DateTime lastTime = DateTime.now();
+
   var valeurBaseX = List();
   var valeurBaseY = List();
   var positionXEtoile = List();
@@ -44,9 +48,18 @@ class _HomeContentState extends State<HomeContent>
   AnimationController percentageAnimationController;
   String _timeString;
   String xFois = "";
+
+  Timer t;
   @override
+  void dispose() {
+    t.cancel();
+    super.dispose();
+  }
+
   //Instancie le valeur de base du programme
+  @override
   void initState() {
+    super.initState();
     int difference = j2000.difference(now).inSeconds;
     fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
     fractionDeTour = fractionDeTour - fractionDeTour.floor();
@@ -348,15 +361,15 @@ class _HomeContentState extends State<HomeContent>
     _timeString = now.toString();
 
 //Modifie le temps de l'horloge affichée en bas à droite de l'écran
-    Timer.periodic(
-        Duration(milliseconds: 1000), (Timer t) => _getCurrentTime());
-    super.initState();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      _getCurrentTime();
+      this.t = t;
+    });
     setState(() {
-      SystemChrome.setEnabledSystemUIOverlays([]);
       percentage = 0.0;
     });
     percentageAnimationController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 100))
+        vsync: this, duration: new Duration(milliseconds: 1000))
       ..addListener(() {
         setState(() {
           percentage = lerpDouble(
@@ -369,135 +382,165 @@ class _HomeContentState extends State<HomeContent>
   @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold.of(context);
-    return new Container(
-        height: 700,
-        width: 500,
-        child: SingleChildScrollView(
-            child: new Column(children: [
-          new Row(mainAxisSize: MainAxisSize.max, children: [
-            new Container(
-              height: 500,
-              width: 50,
-              child: new Column(children: [
-                new IconButton(
-                  icon: Icon(Icons.add),
-                  iconSize: 20.0,
-                  color: Colors.white,
-                  tooltip: 'Increase value of star rate',
-                  onPressed: () {
-                    setState(() {
-                      if (nbDeFoisBouton < 4) {
-                        nbDeFoisBouton++;
-                        rateSpeed = pow(10, nbDeFoisBouton);
-                        textX = rateSpeed.toInt();
-                      } else {
-                        scaffold.showSnackBar(SnackBar(
-                            duration: const Duration(seconds: 1),
-                            content:
-                                const Text('Le nombre maximum est atteint ')));
-                      }
-                    });
-                  },
+    return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => MyApp()));
+            },
+          ),
+          backgroundColor: Colors.black,
+          title: Text("Astronomie"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.live_help),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ChatBot()));
+              },
+            )
+          ],
+        ),
+        body: new Container(
+            color: Colors.black,
+            height: 1000,
+            width: 500,
+            child: SingleChildScrollView(
+                child: new Column(children: [
+              new Row(mainAxisSize: MainAxisSize.max, children: [
+                new Container(
+                  height: 500,
+                  width: 50,
+                  child: new Column(children: [
+                    new IconButton(
+                      icon: Icon(Icons.add),
+                      iconSize: 20.0,
+                      color: Colors.white,
+                      tooltip: 'Increase value of star rate',
+                      onPressed: () {
+                        setState(() {
+                          if (nbDeFoisBouton < 4) {
+                            nbDeFoisBouton++;
+                            rateSpeed = pow(10, nbDeFoisBouton);
+                            textX = rateSpeed.toInt();
+                          } else {
+                            scaffold.showSnackBar(SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: const Text(
+                                    'Le nombre maximum est atteint ')));
+                          }
+                        });
+                      },
+                    ),
+                    new Text(
+                      "x$textX",
+                      style: TextStyle(color: Colors.white),
+                      textDirection: TextDirection.ltr,
+                    ),
+                    new IconButton(
+                      icon: Icon(Icons.minimize),
+                      iconSize: 20.0,
+                      color: Colors.white,
+                      tooltip: 'Decrease value of star rate',
+                      onPressed: () {
+                        setState(() {
+                          if (nbDeFoisBouton > 0) {
+                            nbDeFoisBouton--;
+                            rateSpeed = pow(10, nbDeFoisBouton);
+                            textX = rateSpeed.toInt();
+                          } else {
+                            scaffold.showSnackBar(SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: const Text(
+                                    'Le nombre minimum est atteint')));
+                          }
+                        });
+                      },
+                    ),
+                  ]),
                 ),
-                new Text(
-                  "x$textX",
-                  style: TextStyle(color: Colors.white),
-                  textDirection: TextDirection.ltr,
-                ),
-                new IconButton(
-                  icon: Icon(Icons.minimize),
-                  iconSize: 20.0,
-                  color: Colors.white,
-                  tooltip: 'Decrease value of star rate',
-                  onPressed: () {
-                    setState(() {
-                      if (nbDeFoisBouton > 0) {
-                        nbDeFoisBouton--;
-                        rateSpeed = pow(10, nbDeFoisBouton);
-                        textX = rateSpeed.toInt();
-                      } else {
-                        scaffold.showSnackBar(SnackBar(
-                            duration: const Duration(seconds: 1),
-                            content:
-                                const Text('Le nombre minimum est atteint')));
-                      }
-                    });
-                  },
+                new Container(
+                  height: 500,
+                  child: CustomPaint(
+                    foregroundPainter: new MyPainter(
+                        lineColor: Colors.black,
+                        completeColor: Colors.white,
+                        completex: positionXCanevas,
+                        completey: positionYCanevas,
+                        width: 8.0,
+                        text: _timeString,
+                        nomListe: nomEtoile,
+                        nom: etoile.text),
+                  ),
                 ),
               ]),
-            ),
-            new Container(
-              height: 500,
-              child: CustomPaint(
-                foregroundPainter: new MyPainter(
-                    lineColor: Colors.black,
-                    completeColor: Colors.white,
-                    completex: positionXCanevas,
-                    completey: positionYCanevas,
-                    width: 8.0,
-                    text: _timeString,
-                    nomListe: nomEtoile,
-                    nom: etoile.text),
+              new Text(
+                "Entrer la date désirée",
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.white),
+                textDirection: TextDirection.ltr,
               ),
-            ),
-          ]),
-          new Text(
-            "Entrer la date désirée",
-            textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.white),
-            textDirection: TextDirection.ltr,
-          ),
-          new TextField(
-              controller: nouveauTemps,
-              style: TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
-              decoration: InputDecoration(
-                  enabledBorder: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white)),
-                  hintText: "AAAA-MM-JJ HH:MM:SS",
-                  hintStyle: TextStyle(color: Colors.white))),
-          new Text(
-            "Entrer le nom de l'étoile",
-            textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.white),
-            textDirection: TextDirection.ltr,
-          ),
-          new TextField(
-              controller: etoile,
-              style: TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
-              decoration: InputDecoration(
-                  enabledBorder: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white)),
-                  hintText: "Nom Etoile",
-                  hintStyle: TextStyle(color: Colors.white))),
-          new IconButton(
-              icon: Icon(Icons.refresh),
-              iconSize: 20.0,
-              color: Colors.white,
-              tooltip: 'Les valeurs sont réinitialisées',
-              onPressed: () {
-                setState(() {
-                  now = DateTime.now();
-                  nouveauTemps.clear();
-                  etoile.clear();
-                });
-              })
-        ])));
+              new TextField(
+                  controller: nouveauTemps,
+                  style:
+                      TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
+                  decoration: InputDecoration(
+                      enabledBorder: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.white)),
+                      hintText: "AAAA-MM-JJ HH:MM:SS",
+                      hintStyle: TextStyle(color: Colors.white))),
+              new Text(
+                "Entrer le nom de l'étoile",
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.white),
+                textDirection: TextDirection.ltr,
+              ),
+              new TextField(
+                  controller: etoile,
+                  style:
+                      TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
+                  decoration: InputDecoration(
+                      enabledBorder: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.white)),
+                      hintText: "Nom Etoile",
+                      hintStyle: TextStyle(color: Colors.white))),
+              new IconButton(
+                  icon: Icon(Icons.refresh),
+                  iconSize: 20.0,
+                  color: Colors.white,
+                  //tooltip: 'Les valeurs sont réinitialisées',
+                  onPressed: () {
+                    scaffold.showSnackBar(SnackBar(
+                        duration: const Duration(seconds: 1),
+                        content:
+                            const Text('Les valeurs sont réinitialisées')));
+
+                    setState(() {
+                      now = DateTime.now();
+                      nouveauTemps.clear();
+                      etoile.clear();
+                    });
+                  })
+            ]))));
   }
 
 //Fonction qui incrémente le temps
   void _getCurrentTime() {
-    if (nouveauTemps.text.isNotEmpty == true && bonneHeure == false) {
-      now = DateTime.parse(nouveauTemps.text);
-      int difference = j2000.difference(now).inSeconds;
-      fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
-      fractionDeTour = fractionDeTour - fractionDeTour.floor();
-      newPercentage = fractionDeTour * 2 * pi;
-      bonneHeure = true;
-    }
-    var duration = new Duration(seconds: rateSpeed.toInt());
-    now = now.add(duration);
-
     setState(() {
+      if (nouveauTemps.text.isNotEmpty == true && bonneHeure == false) {
+        try {
+          now = DateTime.parse(nouveauTemps.text);
+          int difference = j2000.difference(now).inSeconds;
+          fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
+          fractionDeTour = fractionDeTour - fractionDeTour.floor();
+          newPercentage = fractionDeTour * 2 * pi;
+          bonneHeure = true;
+        } catch (e) {}
+      }
+      var duration = new Duration(seconds: rateSpeed.toInt());
+      now = now.add(duration);
       _timeString = now.toString();
 
       for (int i = 0; i < 46; i++) {

@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:login_app/setting_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class ChatBot extends StatefulWidget {
@@ -202,7 +200,7 @@ class _ChatBotState extends State<ChatBot> {
   }
 }
 
-//Message Bubles
+//Message Bubbles
 class Messages extends StatelessWidget {
   final String message;
   final bool reader;
