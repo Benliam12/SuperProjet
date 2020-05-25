@@ -1,15 +1,16 @@
+/*
+Auteur du fichier : William
+*/
 import 'package:flutter/material.dart';
 import 'package:login_app/Astro.dart';
 import 'package:login_app/calculator.dart';
 import 'package:login_app/chimie.dart';
 import 'package:login_app/flashcard.dart';
-import 'package:login_app/setting_manager.dart';
 
 import 'chatbot.dart';
 
 void main() {
   ///Setting up required datas.
-  SettingsManager.getInstance().setup();
   runApp(MyApp());
 }
 
@@ -18,11 +19,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Student tool kit',
+      title: 'EzStudy',
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: MyHomePage(title: "Student Tool kit"),
+      home: MyHomePage(title: "EzStudy"),
     );
   }
 }

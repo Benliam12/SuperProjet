@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'package:flutter/cupertino.dart';
 
 import 'carte.dart';

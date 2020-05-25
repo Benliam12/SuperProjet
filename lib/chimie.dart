@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Éloïse
+*/
 import 'package:flutter/material.dart';
 import 'package:login_app/chatbot.dart';
 import 'package:login_app/imdumb.dart';
@@ -92,7 +95,6 @@ class _MyPageState extends State<MyPage> {
         textReactifs.toString().isEmpty ||
         !isLegit2 ||
         textProduits.toString().isEmpty) {
-      print("fuck u");
       showMessageErreur(context);
       return;
     }
@@ -148,7 +150,6 @@ class _MyPageState extends State<MyPage> {
     }
 
     if (!allo) {
-      print("fuckk u");
       showMessageErreur(context);
       return;
     }

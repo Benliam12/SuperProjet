@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Marc-Antoine
+*/
 import 'dart:io';
 import 'dart:ui';
 
@@ -930,9 +933,9 @@ class Balancement3Variables extends State<Balancement3VariablesWidget> {
               "/" +
               denominateur.determinant().toStringAsFixed(0);
         } else if (denominateur.determinant() == 0 &&
-            numerateurX.determinant() == 0 &&
-            numerateurY.determinant() == 0 &&
-            numerateurZ.determinant() == 0) {
+            (numerateurX.determinant() != 0 ||
+                numerateurY.determinant() != 0 ||
+                numerateurZ.determinant() != 0)) {
           resultX = '';
           resultY = '';
           resultZ = '';
@@ -940,8 +943,7 @@ class Balancement3Variables extends State<Balancement3VariablesWidget> {
           resultPrecisX = '';
           resultPrecisY = '';
           resultPrecisZ = '';
-          otherSolution =
-              "Le système d'équation admet soit aucune solution ou une infinité de solutions";
+          otherSolution = "Le système d'équation admet soit aucune solution";
         } else if (denominateur.determinant() == 0 &&
             (numerateurX.determinant() != 0 ||
                 numerateurY.determinant() != 0 ||
@@ -954,6 +956,19 @@ class Balancement3Variables extends State<Balancement3VariablesWidget> {
           resultPrecisY = '';
           resultPrecisZ = '';
           otherSolution = "Le système d'équation n'admet aucune solution";
+        } else if (denominateur.determinant() == 0 &&
+            numerateurX.determinant() == 0 &&
+            numerateurY.determinant() == 0 &&
+            numerateurZ.determinant() == 0) {
+          resultX = '';
+          resultY = '';
+          resultZ = '';
+          ou = '';
+          resultPrecisX = '';
+          resultPrecisY = '';
+          resultPrecisZ = '';
+          otherSolution =
+              "Le système d'équation n'admet une infinité de solutions solution";
         }
       });
     } on ChampVide {
@@ -1273,7 +1288,7 @@ class Balancement2Variables extends State<Balancement2VariablesWidget> {
           resultPrecisX = '';
           resultPrecisY = '';
           otherSolution =
-              "Les droites sont parallèles confondues,\n il y a donc une infinité de solutions";
+              "Les droites sont parallèles dintinctes,\n il n'y a donc aucune solution";
         } else if (denominateur.determinant() == 0 &&
             numerateurX.determinant() == 0 &&
             numerateurY.determinant() == 0) {
@@ -1283,7 +1298,7 @@ class Balancement2Variables extends State<Balancement2VariablesWidget> {
           resultPrecisX = '';
           resultPrecisY = '';
           otherSolution =
-              "Les droites sont parallèles distinctes,\n il n'y a donc aucune solution";
+              "Les droites sont parallèles confondues,\n il n'y a donc une infinité de solutions";
         }
       });
     } on ChampVide {

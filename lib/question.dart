@@ -1,9 +1,11 @@
-class Question{
+/*
+Auteur du fichier : Randy
+*/
+class Question {
   String question;
   String reponseQuestion;
 
-  Question(this.question,this.reponseQuestion);
+  Question(this.question, this.reponseQuestion);
 
   String get questions => null;
- 
 }

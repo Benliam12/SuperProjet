@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'dart:ui';
 
 import 'package:login_app/flashcard.dart';

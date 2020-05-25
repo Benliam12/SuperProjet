@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'dart:async';
 import 'dart:math';
 

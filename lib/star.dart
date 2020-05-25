@@ -1,8 +1,11 @@
+/*
+Auteur du fichier : Ariel
+*/
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Star extends StatelessWidget{
-  Widget build (BuildContext context){
+class Star extends StatelessWidget {
+  Widget build(BuildContext context) {
     return new Container(
       width: 10,
       height: 10,
@@ -11,6 +14,5 @@ class Star extends StatelessWidget{
         shape: BoxShape.circle,
       ),
     );
-    
   }
 }

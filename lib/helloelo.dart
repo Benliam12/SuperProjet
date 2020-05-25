@@ -1,3 +1,6 @@
+/*
+  Fichier de test. Ne sert qu'à tester des fonctionalités sur une page vierge. 
+*/
 import 'dart:convert';
 
 import 'package:flutter/material.dart';

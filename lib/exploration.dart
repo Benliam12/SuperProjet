@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'package:login_app/paquet.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';

@@ -1,20 +1,36 @@
+/*============================================
+Auteur:       Ariel Fontau
+Laboratoire:  Projet intégrateur de SIM
+Nom fichier:  home.dart
+Date:         2020-04-21
+But:          Peint les étoiles sur l'écran
+==============================================*/
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
 class MyPainter extends CustomPainter {
-  int etoileRouge;
-  bool isEtoileRouge = false;
   Color lineColor;
   Color completeColor;
-  var pointListe = List();
-  var nomListe = List();
-  String nom = "";
-  var completex = List();
-  var completey = List();
-  var offsetMilieu;
-  String text;
-  double width;
+
+  int etoileRouge; //Position de l'étoile que l'utilisateur souhaite regarder
+
+  bool isEtoileRouge =
+      false; //Booléenne qui permet de savoir si l'utilsateur a rentré une étoile
+
+  Color couleurEtoile; // Couleur des étoiles sur l'écran
+
+  var nomListe = List(); // Array ayant les noms des étoiles
+  var completex =
+      List(); // Array ayant les valeurs des étoiles sur l'écran en x
+  var completey = List(); //Array ayant les valeurs des étoiles sur l'écran en y
+  var offsetMilieu; // Crée le point de l'étoile recherchée par l'utilisateur
+
+  String
+      text; //String ayant la valeur du temps affiché en bas à droite de l'écran
+  String nom =
+      ""; //String qui contient le nom de l'étoile souhiaté par l'utilisateur
+  double width; //Grosseur de l'étoile
   MyPainter(
       {this.lineColor,
       this.completeColor,
@@ -26,7 +42,6 @@ class MyPainter extends CustomPainter {
       this.nom});
   @override
   void paint(Canvas canvas, Size size) {
-    pointListe.length = 46;
     nomListe.length = 46;
     Paint complete = new Paint();
     complete.color = completeColor;

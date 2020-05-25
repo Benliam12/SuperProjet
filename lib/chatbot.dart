@@ -1,9 +1,11 @@
+/*
+Auteur du fichier : William
+*/
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:login_app/setting_manager.dart';
 import 'package:http/http.dart' as http;
 
 class ChatBot extends StatefulWidget {
@@ -31,8 +33,6 @@ class _ChatBotState extends State<ChatBot> {
     setState(() {
       messageBuilders.clear();
     });
-
-    SettingsManager.getInstance().testRead();
   }
 
   void makeControllers() {
@@ -42,6 +42,7 @@ class _ChatBotState extends State<ChatBot> {
     }
 
     setState(() {
+      //User's message
       FutureBuilder<Messages> builder1 = FutureBuilder<Messages>(
           future: userQuestion(message),
           builder: (context, snapshot) {
@@ -51,6 +52,7 @@ class _ChatBotState extends State<ChatBot> {
             );
           });
 
+      //System's message
       FutureBuilder<Messages> builder2 = FutureBuilder<Messages>(
           future: serverQuestion(message),
           builder: (context, snapshot) {
@@ -61,8 +63,11 @@ class _ChatBotState extends State<ChatBot> {
               );
             }
 
+            //Show when waiting for server response.
             return new Messages(message: "...", reader: false);
           });
+
+      //Add to Message list
       messageBuilders.add(builder1);
       setState(() {
         _scrollController.animateTo(
@@ -71,20 +76,24 @@ class _ChatBotState extends State<ChatBot> {
           duration: const Duration(milliseconds: 300),
         );
       });
+
+      //Clear user inputs
       myController.clear();
-      sleep(new Duration(milliseconds: 300));
+      sleep(new Duration(milliseconds: 300)); //Smoothing animation
+
+      //Add to Message list
       messageBuilders.add(builder2);
     });
   }
 
   Future<Messages> userQuestion(String message) async {
-    setState(() {});
     return new Messages(
       message: message,
       reader: true,
     );
   }
 
+  //Request to Server
   Future<Messages> serverQuestion(String message) async {
     String url = "http://vps.benliam12.net:8000";
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -111,11 +120,11 @@ class _ChatBotState extends State<ChatBot> {
         response = await http.post(url, headers: headers, body: jsonString);
         if (response.statusCode == 200) {
           answer = response.body;
-          // answer = jsonDecode(response.body)[0];
         }
       } catch (e) {}
     }
     setState(() {
+      //Animate the messages
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent + 100,
         curve: Curves.easeOut,
@@ -129,6 +138,7 @@ class _ChatBotState extends State<ChatBot> {
     );
   }
 
+  //Main stuff
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
@@ -166,21 +176,20 @@ class _ChatBotState extends State<ChatBot> {
                           controller: myController,
                           validator: (value) {
                             if (value == null) {
-                              return 'Please enter some text';
+                              return 'Veuillez enter du texte';
                             }
                             return null;
                           },
                           decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.green, width: 1.0)),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.black, width: 1.0),
-                              ),
-                              labelStyle: TextStyle(color: Colors.black),
-                              labelText: SettingsManager.getInstance()
-                                  .getString("enter_message")),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.green, width: 1.0)),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.black, width: 1.0),
+                            ),
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
                         ),
                       ),
                       IconButton(
@@ -233,7 +242,6 @@ class Messages extends StatelessWidget {
         child: Align(
             alignment: this.alignment,
             child: FittedBox(
-              //fit: BoxFit.fill, // otherwise the logo will be tiny
               child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(

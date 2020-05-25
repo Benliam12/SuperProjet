@@ -1,3 +1,10 @@
+/*============================================
+Auteur:       Ariel Fontau
+Laboratoire:  Projet intégrateur de SIM
+Nom fichier:  home.dart
+Date:         2020-03-19
+But:          Instancie les valeurs de base de l'application
+==============================================*/
 import 'dart:async';
 
 import 'dart:math';
@@ -16,37 +23,43 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent>
     with TickerProviderStateMixin {
-  TextEditingController nouveauTemps = new TextEditingController();
-  TextEditingController etoile = new TextEditingController();
-  bool bonneHeure = false;
-  int time = new DateTime.now().second;
-  int facteurMultiplicatif = 9;
-  int compteur = 0;
-  int textX;
-  double fractionDeTour;
-  double posY = 0.0;
-  double y0 = 0.0;
-  double x0 = 0.0;
-  double percentage = 0.0;
-  double posX = 0.0;
-  double newPercentage = 0;
-  double nbDeFoisBouton = 0;
-  double rateSpeed = 1;
+  TextEditingController nouveauTemps =
+      new TextEditingController(); //Prend la réponse de l'utilisateur sur le temps où il sohaite regarder les étoiles
+  TextEditingController etoile =
+      new TextEditingController(); //Prend la réponse de l'utilisateur sur le nom de l'étoile que souhaite regarder l'utilisateur
 
-  DateTime lastTime = DateTime.now();
+  bool bonneHeure = false; // Booléenne qui permet de changer le temps affiché
 
-  var valeurBaseX = List();
-  var valeurBaseY = List();
-  var positionXEtoile = List();
-  var positionYEtoile = List();
-  var positionXCanevas = List();
-  var positionYCanevas = List();
-  var nomEtoile = List();
-  var rayon = List();
-  DateTime now = DateTime.now();
-  DateTime j2000 = DateTime.parse("2000-01-01 00:00:00");
+  int facteurMultiplicatif =
+      9; // Facteur multiplicatif permettant d'afficher les étoiles avec un plus grand espace entre elles
+  int textX; // Texte qui affiche la rapidité de progression des étoiles
+
+  double
+      fractionDeTour; //Permet de savoir le décalage créé par le temps entre l'an 2000 et le temps sohaité
+  double percentage = 0.0; // Valeur de l'angle créé par le décalage du temps
+  double newPercentage =
+      0; // Valeur de l'angle créé par le décalage du temps incrémentée
+  double nbDeFoisBouton =
+      0; //Nombre de fois que le bouton plus et moins on été appuyés
+  double rateSpeed = 1; //rapidité de progression des étoiles
+
+  var valeurBaseX =
+      List(); //Array ayant les valeurs d'ascension droite en degrés
+  var valeurBaseY = List(); //Array ayant les valeurs de déclinaisons en degrés
+  var positionXEtoile =
+      List(); //Position brute de l'étoile en x selon l'algorithme 2
+  var positionYEtoile =
+      List(); //Position brute de l'étoile en y selon l'algorithme 2
+  var positionXCanevas = List(); //Position sur l'écran de l'étoile en x
+  var positionYCanevas = List(); //Position sur l'écran de l'étoile en y
+  var nomEtoile = List(); //Array ayant le nom des étoiles
+  var rayon = List(); //Array des rayons pour chaque étoile
+  DateTime now =
+      DateTime.now(); //Valeur du temps auquel on souhaite regarder les étoiles
+  DateTime j2000 = DateTime.parse(
+      "2000-01-01 00:00:00"); // Valeur qui contient le temps auquel ont été prises les valeurs des étoile
   AnimationController percentageAnimationController;
-  String _timeString;
+  String _timeString; // String qui contient le temps affiché en bas à droite
   String xFois = "";
 
   Timer t;
@@ -414,6 +427,8 @@ class _HomeContentState extends State<HomeContent>
                   height: 500,
                   width: 50,
                   child: new Column(children: [
+                    //Bouton avec le signe plus qui permet d'augmenter le rythme de progression des étoiles
+
                     new IconButton(
                       icon: Icon(Icons.add),
                       iconSize: 20.0,
@@ -435,10 +450,12 @@ class _HomeContentState extends State<HomeContent>
                       },
                     ),
                     new Text(
+                      //Texte indiquant le rythme de progression des étoiles
                       "x$textX",
                       style: TextStyle(color: Colors.white),
                       textDirection: TextDirection.ltr,
                     ),
+                    //Bouton avec le signe moins permettant de diminuer le rythme de progression des étoiles
                     new IconButton(
                       icon: Icon(Icons.minimize),
                       iconSize: 20.0,
@@ -463,6 +480,7 @@ class _HomeContentState extends State<HomeContent>
                 ),
                 new Container(
                   height: 500,
+                  //Permet de montrer les étoiles
                   child: CustomPaint(
                     foregroundPainter: new MyPainter(
                         lineColor: Colors.black,
@@ -476,12 +494,14 @@ class _HomeContentState extends State<HomeContent>
                   ),
                 ),
               ]),
+              //Texte servant à demander quelle date l'utilisateur souhaite rentrer
               new Text(
                 "Entrer la date désirée",
                 textAlign: TextAlign.left,
                 style: TextStyle(color: Colors.white),
                 textDirection: TextDirection.ltr,
               ),
+              // Prend la date de l'utilisateur
               new TextField(
                   controller: nouveauTemps,
                   style:
@@ -491,6 +511,7 @@ class _HomeContentState extends State<HomeContent>
                           borderSide: new BorderSide(color: Colors.white)),
                       hintText: "AAAA-MM-JJ HH:MM:SS",
                       hintStyle: TextStyle(color: Colors.white))),
+              //Demande quelle étoile l'utilisateur veut entrer
               new Text(
                 "Entrer le nom de l'étoile",
                 textAlign: TextAlign.left,
