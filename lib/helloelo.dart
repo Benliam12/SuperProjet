@@ -1,11 +1,10 @@
+/*
+  Fichier de test. Ne sert qu'à tester des fonctionalités sur une page vierge. 
+*/
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:math_expressions/math_expressions.dart';
-import 'dart:math' as math;
 import 'package:http/http.dart' as http;
-import 'package:convert/convert.dart';
 
 class HelloElo extends StatefulWidget {
   HelloElo({Key key}) : super(key: key);

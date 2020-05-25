@@ -1,7 +1,9 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'dart:ui';
 
 import 'package:login_app/flashcard.dart';
-import 'package:login_app/main.dart';
 import 'package:login_app/statistiques.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

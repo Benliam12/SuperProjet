@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 class Carte {
   String devant;
   String derriere;

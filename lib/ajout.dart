@@ -1,19 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+/*
+Auteur du fichier : Randy
+*/
 import 'package:login_app/carte.dart';
 import 'package:login_app/flashcard.dart';
-import 'package:login_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:math' as math;
 
 import 'paquet.dart';
 
 class AjoutDart extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return StateAjoutDart();
   }
 }
@@ -38,7 +38,6 @@ class StateAjoutDart extends State<AjoutDart> {
   void initState() {
     super.initState();
     getApplicationDocumentsDirectory().then((Directory directory) {
-      print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
       dir = directory;
       jsonFile = new File(dir.path + "/" + fileName);
     });
@@ -63,7 +62,7 @@ class StateAjoutDart extends State<AjoutDart> {
     print("Writing to file");
     print(dir.path);
 
-    Map<String, dynamic> content = {key: value};
+    //Map<String, dynamic> content = {key: value};
     if (jsonFile.existsSync()) {
       print("File exists");
       paquet = jsonDecode(jsonFile.readAsStringSync());
@@ -127,14 +126,6 @@ class StateAjoutDart extends State<AjoutDart> {
               ));
       return false;
     }
-
-    /*
-    for(int i = 0;i<paquetCree.listCartes.length;i++){
-    paquetCree.listCartes[i].toJson();
-    
-  }
-  */
-
     writeToFile("0", paquetCree.toJson());
 
     return true;

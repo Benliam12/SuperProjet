@@ -1,5 +1,7 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:login_app/paquet.dart';
@@ -23,7 +25,6 @@ class QuizzDart extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return QuizzDartState(paquet: this.paquet, index: index);
   }
 }
@@ -235,8 +236,6 @@ class QuizzDartState extends State<QuizzDart> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-
     generateQuestions();
     return WillPopScope(
       onWillPop: _onbackpressed,

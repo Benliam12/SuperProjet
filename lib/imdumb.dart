@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
-
+/*
+Auteur du fichier : Éloïse
+*/
 class Atome {
   static bool isNumeric(String s) {
     if (s == null) {
@@ -180,7 +181,6 @@ class Atome {
             temp.add(matrix[k][l]);
             matrix[k][l] = matrix[r - 1][l];
             matrix[r - 1][l] = temp[l];
-            print("allo");
           }
         }
 

@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Éloïse
+*/
 import 'package:flutter/material.dart';
 
 class GrosModeles extends StatelessWidget {

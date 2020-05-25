@@ -1,10 +1,18 @@
+/*============================================
+Auteur:       Ariel Fontau
+Laboratoire:  Projet intégrateur de SIM
+Nom fichier:  home.dart
+Date:         2020-03-19
+But:          Instancie les valeurs de base de l'application
+==============================================*/
 import 'dart:async';
 
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:login_app/chatbot.dart';
+import 'package:login_app/main.dart';
 
 import 'MyPainter.dart';
 
@@ -15,38 +23,56 @@ class HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<HomeContent>
     with TickerProviderStateMixin {
-  TextEditingController nouveauTemps = new TextEditingController();
-  TextEditingController etoile = new TextEditingController();
-  bool bonneHeure = false;
-  int time = new DateTime.now().second;
-  int facteurMultiplicatif = 9;
-  int compteur = 0;
-  int textX;
-  double fractionDeTour;
-  double posY = 0.0;
-  double y0 = 0.0;
-  double x0 = 0.0;
-  double percentage = 0.0;
-  double posX = 0.0;
-  double newPercentage = 0;
-  double nbDeFoisBouton = 0;
-  double rateSpeed = 1;
-  var valeurBaseX = List();
-  var valeurBaseY = List();
-  var positionXEtoile = List();
-  var positionYEtoile = List();
-  var positionXCanevas = List();
-  var positionYCanevas = List();
-  var nomEtoile = List();
-  var rayon = List();
-  DateTime now = DateTime.now();
-  DateTime j2000 = DateTime.parse("2000-01-01 00:00:00");
+  TextEditingController nouveauTemps =
+      new TextEditingController(); //Prend la réponse de l'utilisateur sur le temps où il sohaite regarder les étoiles
+  TextEditingController etoile =
+      new TextEditingController(); //Prend la réponse de l'utilisateur sur le nom de l'étoile que souhaite regarder l'utilisateur
+
+  bool bonneHeure = false; // Booléenne qui permet de changer le temps affiché
+
+  int facteurMultiplicatif =
+      9; // Facteur multiplicatif permettant d'afficher les étoiles avec un plus grand espace entre elles
+  int textX; // Texte qui affiche la rapidité de progression des étoiles
+
+  double
+      fractionDeTour; //Permet de savoir le décalage créé par le temps entre l'an 2000 et le temps sohaité
+  double percentage = 0.0; // Valeur de l'angle créé par le décalage du temps
+  double newPercentage =
+      0; // Valeur de l'angle créé par le décalage du temps incrémentée
+  double nbDeFoisBouton =
+      0; //Nombre de fois que le bouton plus et moins on été appuyés
+  double rateSpeed = 1; //rapidité de progression des étoiles
+
+  var valeurBaseX =
+      List(); //Array ayant les valeurs d'ascension droite en degrés
+  var valeurBaseY = List(); //Array ayant les valeurs de déclinaisons en degrés
+  var positionXEtoile =
+      List(); //Position brute de l'étoile en x selon l'algorithme 2
+  var positionYEtoile =
+      List(); //Position brute de l'étoile en y selon l'algorithme 2
+  var positionXCanevas = List(); //Position sur l'écran de l'étoile en x
+  var positionYCanevas = List(); //Position sur l'écran de l'étoile en y
+  var nomEtoile = List(); //Array ayant le nom des étoiles
+  var rayon = List(); //Array des rayons pour chaque étoile
+  DateTime now =
+      DateTime.now(); //Valeur du temps auquel on souhaite regarder les étoiles
+  DateTime j2000 = DateTime.parse(
+      "2000-01-01 00:00:00"); // Valeur qui contient le temps auquel ont été prises les valeurs des étoile
   AnimationController percentageAnimationController;
-  String _timeString;
+  String _timeString; // String qui contient le temps affiché en bas à droite
   String xFois = "";
+
+  Timer t;
   @override
+  void dispose() {
+    t.cancel();
+    super.dispose();
+  }
+
   //Instancie le valeur de base du programme
+  @override
   void initState() {
+    super.initState();
     int difference = j2000.difference(now).inSeconds;
     fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
     fractionDeTour = fractionDeTour - fractionDeTour.floor();
@@ -348,15 +374,15 @@ class _HomeContentState extends State<HomeContent>
     _timeString = now.toString();
 
 //Modifie le temps de l'horloge affichée en bas à droite de l'écran
-    Timer.periodic(
-        Duration(milliseconds: 1000), (Timer t) => _getCurrentTime());
-    super.initState();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      _getCurrentTime();
+      this.t = t;
+    });
     setState(() {
-      SystemChrome.setEnabledSystemUIOverlays([]);
       percentage = 0.0;
     });
     percentageAnimationController = new AnimationController(
-        vsync: this, duration: new Duration(milliseconds: 100))
+        vsync: this, duration: new Duration(milliseconds: 1000))
       ..addListener(() {
         setState(() {
           percentage = lerpDouble(
@@ -369,135 +395,173 @@ class _HomeContentState extends State<HomeContent>
   @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold.of(context);
-    return new Container(
-        height: 700,
-        width: 500,
-        child: SingleChildScrollView(
-            child: new Column(children: [
-          new Row(mainAxisSize: MainAxisSize.max, children: [
-            new Container(
-              height: 500,
-              width: 50,
-              child: new Column(children: [
-                new IconButton(
-                  icon: Icon(Icons.add),
-                  iconSize: 20.0,
-                  color: Colors.white,
-                  tooltip: 'Increase value of star rate',
-                  onPressed: () {
-                    setState(() {
-                      if (nbDeFoisBouton < 4) {
-                        nbDeFoisBouton++;
-                        rateSpeed = pow(10, nbDeFoisBouton);
-                        textX = rateSpeed.toInt();
-                      } else {
-                        scaffold.showSnackBar(SnackBar(
-                            duration: const Duration(seconds: 1),
-                            content:
-                                const Text('Le nombre maximum est atteint ')));
-                      }
-                    });
-                  },
+    return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => MyApp()));
+            },
+          ),
+          backgroundColor: Colors.black,
+          title: Text("Astronomie"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.live_help),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ChatBot()));
+              },
+            )
+          ],
+        ),
+        body: new Container(
+            color: Colors.black,
+            height: 1000,
+            width: 500,
+            child: SingleChildScrollView(
+                child: new Column(children: [
+              new Row(mainAxisSize: MainAxisSize.max, children: [
+                new Container(
+                  height: 500,
+                  width: 50,
+                  child: new Column(children: [
+                    //Bouton avec le signe plus qui permet d'augmenter le rythme de progression des étoiles
+
+                    new IconButton(
+                      icon: Icon(Icons.add),
+                      iconSize: 20.0,
+                      color: Colors.white,
+                      tooltip: 'Increase value of star rate',
+                      onPressed: () {
+                        setState(() {
+                          if (nbDeFoisBouton < 4) {
+                            nbDeFoisBouton++;
+                            rateSpeed = pow(10, nbDeFoisBouton);
+                            textX = rateSpeed.toInt();
+                          } else {
+                            scaffold.showSnackBar(SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: const Text(
+                                    'Le nombre maximum est atteint ')));
+                          }
+                        });
+                      },
+                    ),
+                    new Text(
+                      //Texte indiquant le rythme de progression des étoiles
+                      "x$textX",
+                      style: TextStyle(color: Colors.white),
+                      textDirection: TextDirection.ltr,
+                    ),
+                    //Bouton avec le signe moins permettant de diminuer le rythme de progression des étoiles
+                    new IconButton(
+                      icon: Icon(Icons.minimize),
+                      iconSize: 20.0,
+                      color: Colors.white,
+                      tooltip: 'Decrease value of star rate',
+                      onPressed: () {
+                        setState(() {
+                          if (nbDeFoisBouton > 0) {
+                            nbDeFoisBouton--;
+                            rateSpeed = pow(10, nbDeFoisBouton);
+                            textX = rateSpeed.toInt();
+                          } else {
+                            scaffold.showSnackBar(SnackBar(
+                                duration: const Duration(seconds: 1),
+                                content: const Text(
+                                    'Le nombre minimum est atteint')));
+                          }
+                        });
+                      },
+                    ),
+                  ]),
                 ),
-                new Text(
-                  "x$textX",
-                  style: TextStyle(color: Colors.white),
-                  textDirection: TextDirection.ltr,
-                ),
-                new IconButton(
-                  icon: Icon(Icons.minimize),
-                  iconSize: 20.0,
-                  color: Colors.white,
-                  tooltip: 'Decrease value of star rate',
-                  onPressed: () {
-                    setState(() {
-                      if (nbDeFoisBouton > 0) {
-                        nbDeFoisBouton--;
-                        rateSpeed = pow(10, nbDeFoisBouton);
-                        textX = rateSpeed.toInt();
-                      } else {
-                        scaffold.showSnackBar(SnackBar(
-                            duration: const Duration(seconds: 1),
-                            content:
-                                const Text('Le nombre minimum est atteint')));
-                      }
-                    });
-                  },
+                new Container(
+                  height: 500,
+                  //Permet de montrer les étoiles
+                  child: CustomPaint(
+                    foregroundPainter: new MyPainter(
+                        lineColor: Colors.black,
+                        completeColor: Colors.white,
+                        completex: positionXCanevas,
+                        completey: positionYCanevas,
+                        width: 8.0,
+                        text: _timeString,
+                        nomListe: nomEtoile,
+                        nom: etoile.text),
+                  ),
                 ),
               ]),
-            ),
-            new Container(
-              height: 500,
-              child: CustomPaint(
-                foregroundPainter: new MyPainter(
-                    lineColor: Colors.black,
-                    completeColor: Colors.white,
-                    completex: positionXCanevas,
-                    completey: positionYCanevas,
-                    width: 8.0,
-                    text: _timeString,
-                    nomListe: nomEtoile,
-                    nom: etoile.text),
+              //Texte servant à demander quelle date l'utilisateur souhaite rentrer
+              new Text(
+                "Entrer la date désirée",
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.white),
+                textDirection: TextDirection.ltr,
               ),
-            ),
-          ]),
-          new Text(
-            "Entrer la date désirée",
-            textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.white),
-            textDirection: TextDirection.ltr,
-          ),
-          new TextField(
-              controller: nouveauTemps,
-              style: TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
-              decoration: InputDecoration(
-                  enabledBorder: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white)),
-                  hintText: "AAAA-MM-JJ HH:MM:SS",
-                  hintStyle: TextStyle(color: Colors.white))),
-          new Text(
-            "Entrer le nom de l'étoile",
-            textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.white),
-            textDirection: TextDirection.ltr,
-          ),
-          new TextField(
-              controller: etoile,
-              style: TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
-              decoration: InputDecoration(
-                  enabledBorder: new OutlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white)),
-                  hintText: "Nom Etoile",
-                  hintStyle: TextStyle(color: Colors.white))),
-          new IconButton(
-              icon: Icon(Icons.refresh),
-              iconSize: 20.0,
-              color: Colors.white,
-              tooltip: 'Les valeurs sont réinitialisées',
-              onPressed: () {
-                setState(() {
-                  now = DateTime.now();
-                  nouveauTemps.clear();
-                  etoile.clear();
-                });
-              })
-        ])));
+              // Prend la date de l'utilisateur
+              new TextField(
+                  controller: nouveauTemps,
+                  style:
+                      TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
+                  decoration: InputDecoration(
+                      enabledBorder: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.white)),
+                      hintText: "AAAA-MM-JJ HH:MM:SS",
+                      hintStyle: TextStyle(color: Colors.white))),
+              //Demande quelle étoile l'utilisateur veut entrer
+              new Text(
+                "Entrer le nom de l'étoile",
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.white),
+                textDirection: TextDirection.ltr,
+              ),
+              new TextField(
+                  controller: etoile,
+                  style:
+                      TextStyle(color: Colors.white, height: 1.0, fontSize: 12),
+                  decoration: InputDecoration(
+                      enabledBorder: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.white)),
+                      hintText: "Nom Etoile",
+                      hintStyle: TextStyle(color: Colors.white))),
+              new IconButton(
+                  icon: Icon(Icons.refresh),
+                  iconSize: 20.0,
+                  color: Colors.white,
+                  //tooltip: 'Les valeurs sont réinitialisées',
+                  onPressed: () {
+                    scaffold.showSnackBar(SnackBar(
+                        duration: const Duration(seconds: 1),
+                        content:
+                            const Text('Les valeurs sont réinitialisées')));
+
+                    setState(() {
+                      now = DateTime.now();
+                      nouveauTemps.clear();
+                      etoile.clear();
+                    });
+                  })
+            ]))));
   }
 
 //Fonction qui incrémente le temps
   void _getCurrentTime() {
-    if (nouveauTemps.text.isNotEmpty == true && bonneHeure == false) {
-      now = DateTime.parse(nouveauTemps.text);
-      int difference = j2000.difference(now).inSeconds;
-      fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
-      fractionDeTour = fractionDeTour - fractionDeTour.floor();
-      newPercentage = fractionDeTour * 2 * pi;
-      bonneHeure = true;
-    }
-    var duration = new Duration(seconds: rateSpeed.toInt());
-    now = now.add(duration);
-
     setState(() {
+      if (nouveauTemps.text.isNotEmpty == true && bonneHeure == false) {
+        try {
+          now = DateTime.parse(nouveauTemps.text);
+          int difference = j2000.difference(now).inSeconds;
+          fractionDeTour = difference / (1 / ((1 / 86164) + (1 / 31970760)));
+          fractionDeTour = fractionDeTour - fractionDeTour.floor();
+          newPercentage = fractionDeTour * 2 * pi;
+          bonneHeure = true;
+        } catch (e) {}
+      }
+      var duration = new Duration(seconds: rateSpeed.toInt());
+      now = now.add(duration);
       _timeString = now.toString();
 
       for (int i = 0; i < 46; i++) {

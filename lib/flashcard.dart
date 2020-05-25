@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'dart:io';
 
 import 'package:login_app/carte.dart';
@@ -20,8 +23,6 @@ class FlashCard extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
-
     return _FlashCardState(paquetFini: paquetFini, index: index);
   }
 }
@@ -157,7 +158,6 @@ class _FlashCardState extends State<FlashCard> {
   @override
   Widget build(BuildContext context) {
     // listDynamic.add(paquet);
-    // TODO: implement build
     return MaterialApp(
         home: Builder(
       builder: (context) => Scaffold(
@@ -270,8 +270,6 @@ class _FlashCardState extends State<FlashCard> {
     ));
   }
 }
-
-_getRequests() async {}
 
 class DynamicDeck extends StatelessWidget {
   final int index;

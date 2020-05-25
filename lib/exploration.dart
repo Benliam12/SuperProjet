@@ -1,3 +1,6 @@
+/*
+Auteur du fichier : Randy
+*/
 import 'package:login_app/paquet.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -73,7 +76,6 @@ class Cards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Card(
       color: Colors.lightBlue,
       child: Row(
